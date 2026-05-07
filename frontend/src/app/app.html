@@ -1,18 +1,19 @@
-<header class="app-header">
+<header class="app-header" *ngIf="showHeader()">
   <div class="header-container">
     <div class="header-left">
       <div class="logo">
         <span class="logo-icon">🐾</span>
-        <h1>PetCare</h1>
+        <h1><a href="/login" class="logo-link">PetCare</a></h1>
+
       </div>
     </div>
     <nav class="header-nav">
-      <a href="#" class="nav-link">Dashboard</a>
-      <a href="#" class="nav-link">Agendamentos</a>
-      <a href="#" class="nav-link">Animais</a>
-      <a href="#" class="nav-link">Clientes</a>
-      <a href="#" class="nav-link">Serviços</a>
-      <a href="#" class="nav-link">Funcionários</a>
+      <a href="/dashboard" class="nav-link">Dashboard</a>
+      <a href="/agendamentos" class="nav-link">Agendamentos</a>
+      <a href="/animais" class="nav-link">Animais</a>
+      <a href="/clientes" class="nav-link">Clientes</a>
+      <a href="/servicos" class="nav-link">Serviços</a>
+      <a href="/funcionarios" class="nav-link">Funcionários</a>
     </nav>
     <div class="header-right">
       <button class="user-btn">👤 Perfil</button>
