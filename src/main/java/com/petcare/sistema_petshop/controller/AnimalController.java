@@ -2,6 +2,8 @@ package com.petcare.sistema_petshop.controller;
 
 import com.petcare.sistema_petshop.Service.AnimalService;
 import com.petcare.sistema_petshop.model.Animal;
+import com.petcare.sistema_petshop.model.Cao;
+import com.petcare.sistema_petshop.model.Gato;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +21,14 @@ public class AnimalController {
         return animalService.listarTodos();
     }
 
-    @PostMapping                // anotacao que faz entender que é para criacao ( metodo create  )
-    public Animal salvar(@RequestBody Animal animal){           // faz a traducao do Json para interpretar que isso vai ser uma classe
-        return animalService.salvar(animal);
+    @PostMapping("/cao")               // anotacao que faz entender que é para criacao ( metodo create  )
+   public Animal salvarCao(@RequestBody Cao cao){
+            return animalService.salvar(cao);
+    }
+
+    @PostMapping("/gato")
+    public Animal salvarGato(@RequestBody Gato gato){
+        return animalService.salvar(gato);
     }
 
 }

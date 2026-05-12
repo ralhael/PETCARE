@@ -24,5 +24,9 @@ public abstract class Animal {
     private String alergias;
     private String temperamento;
 
+    @ManyToOne
+    @JoinColumn(name = "cliente_id")
+    private Cliente cliente;
+
 
 }
