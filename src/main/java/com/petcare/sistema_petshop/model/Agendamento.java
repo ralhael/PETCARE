@@ -25,7 +25,7 @@ public class Agendamento {
     private Cliente cliente;
 
 
-    @ManyToOne                      // Varios agendamentos pode pertencer a um animal ( nao ter a repeticao de every agendamento pro animal criar um novo)
+    @ManyToOne(cascade = CascadeType.ALL)                     // Varios agendamentos pode pertencer a um animal ( nao ter a repeticao de every agendamento pro animal criar um novo)
     @JoinColumn(name = "animal_id") // faz o papel de FK para fazer ligacao com id do animal ( em conjunto com o ManyToOne )
     private Animal animal;
 
