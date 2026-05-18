@@ -1,6 +1,7 @@
 package com.petcare.sistema_petshop.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.persistence.*;
@@ -40,6 +41,7 @@ public abstract class Animal {
     private String temperamento;
 
     @ManyToOne
+    @JsonIgnore // evitar tentar puxar cliente dnv aqui do animal
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
 
