@@ -12,4 +12,7 @@ public abstract class Pessoa  {
     @Id               //anotacao que faz entender que é um id
     @GeneratedValue(strategy = GenerationType.IDENTITY) // anotacao que faz o postgre entender que deve criar automatico e seguramente
     private Long id;
+    private String nome;
+    private String telefone;
+    private String cpf;
 }
