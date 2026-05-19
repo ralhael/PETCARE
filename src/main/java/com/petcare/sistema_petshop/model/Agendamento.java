@@ -35,4 +35,9 @@ public class Agendamento {
     private Servico servico;
 
 
+    @ManyToOne                      // varios agendamentos podem ser realizados por um memso funcionario
+    @JoinColumn(name = "funcionario_id")        // faz a fk no agendamento para ligar com o funcionario
+    private Funcionario funcionario;
+
+
 }

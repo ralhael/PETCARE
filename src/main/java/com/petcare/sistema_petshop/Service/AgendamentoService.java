@@ -2,7 +2,9 @@ package com.petcare.sistema_petshop.Service;
 
 
 import com.petcare.sistema_petshop.model.Agendamento;
+import com.petcare.sistema_petshop.model.Funcionario;
 import com.petcare.sistema_petshop.repository.AgendamentoRepository;
+import com.petcare.sistema_petshop.repository.FuncionarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,9 @@ public class AgendamentoService {
 
     @Autowired
     private AgendamentoRepository agendamentoRepository;
+
+    @Autowired
+    private FuncionarioRepository funcionarioRepository;
 
     public List<Agendamento> listarTodos(){
         return agendamentoRepository.findAll();
@@ -35,6 +40,11 @@ public class AgendamentoService {
 
             if(agendamento.getStatus()== null || agendamento.getStatus().isEmpty()){
                 agendamento.setStatus("Pendente");
+            }
+
+            if(agendamento.getFuncionario() != null && agendamento.getFuncionario().getId() != null){
+                Funcionario funcionarioBanco = funcionarioRepository.findById(agendamento.getFuncionario().getId()).orElseThrow(() -> new RuntimeException("Erro: Funcionario nao encontrado no banco de dados"));
+                agendamento.setFuncionario(funcionarioBanco);
             }
 
             return agendamentoRepository.save(agendamento);
