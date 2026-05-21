@@ -1,12 +1,8 @@
 package com.petcare.sistema_petshop.Service;
 
 
-import com.petcare.sistema_petshop.model.Agendamento;
-import com.petcare.sistema_petshop.model.Funcionario;
-import com.petcare.sistema_petshop.model.Servico;
-import com.petcare.sistema_petshop.repository.AgendamentoRepository;
-import com.petcare.sistema_petshop.repository.FuncionarioRepository;
-import com.petcare.sistema_petshop.repository.ServicoRepository;
+import com.petcare.sistema_petshop.model.*;
+import com.petcare.sistema_petshop.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +21,12 @@ public class AgendamentoService {
 
     @Autowired
     private ServicoRepository servicoRepository;
+
+    @Autowired
+    private ClienteRepository clienteRepository;
+
+    @Autowired
+    private AnimalRepository animalRepository;
 
     public List<Agendamento> listarTodos(){
         return agendamentoRepository.findAll();
@@ -55,6 +57,28 @@ public class AgendamentoService {
                 Servico servicoBanco = servicoRepository.findById(agendamento.getServico().getId())
                         .orElseThrow(() -> new RuntimeException("Erro: Serviço não encontrado"));
                 agendamento.setServico(servicoBanco);
+            }
+
+            // validar se existe o cliente
+            if(agendamento.getCliente()!= null && agendamento.getCliente().getId()!= null){         // verifica se o cliente e o id do cliente veio diferente de nulo
+                Cliente clienteBanco = clienteRepository.findById(agendamento.getCliente().getId())  // busca no banco o cliente com o Id é oq ele recebeu
+                        .orElseThrow(() -> new RuntimeException("Erro: Cliente não encontrado no banco de dados "));  // se nao , manda mensagem de erro dizendo que nao foi encontrado no banco
+                agendamento.setCliente(clienteBanco);  // pega o cliente buscado e coloca no agendamento
+            }
+
+            //evitar agendamento duplicado(mesmo dia mesmo horario)
+            if(agendamento.getAnimal()!= null&&agendamento.getAnimal().getId()!= null){           // verifico se o animal ja existe no banco
+                Animal animalBanco = animalRepository.findById(agendamento.getAnimal().getId())
+                        .orElseThrow(() -> new RuntimeException("Erro: Animal não encontrado no banco de dados"));
+                agendamento.setAnimal(animalBanco);
+                boolean animalOcupado = agendamentoRepository.existsByAnimalIdAndDataAndHorario(    // salvo em animal ocupado(boolean ent vai retornar true se o metodo da repository disser que ja existe aql id nql horario e dia)
+                        agendamento.getAnimal().getId(),        // os parametros do metodo q criei no agendamentoRepository
+                        agendamento.getData(),
+                        agendamento.getHorario()
+                );
+                if (animalOcupado){                             // se der true retorna esse erro ai
+                    throw new RuntimeException("Erro: Este animal já possui um agendamento marcado para este mesmo dia e horário.");
+                }
             }
 
 
