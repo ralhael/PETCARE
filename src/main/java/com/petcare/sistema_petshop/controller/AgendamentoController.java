@@ -3,6 +3,7 @@ package com.petcare.sistema_petshop.controller;
 import com.petcare.sistema_petshop.Service.AgendamentoService;
 import com.petcare.sistema_petshop.model.Agendamento;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,11 @@ public class AgendamentoController{
         return agendamentoService.salvar(agendamento);
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<Agendamento> atualizarAgendamento(@PathVariable Long id, @RequestBody Agendamento dadosNovos){
+        Agendamento agendamentoAtualizado = agendamentoService.atualizarAgendamento(id , dadosNovos);
+        return ResponseEntity.ok(agendamentoAtualizado);
+    }
 
 
 }

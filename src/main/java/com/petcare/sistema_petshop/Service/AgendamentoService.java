@@ -3,12 +3,17 @@ package com.petcare.sistema_petshop.Service;
 
 import com.petcare.sistema_petshop.model.*;
 import com.petcare.sistema_petshop.repository.*;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AgendamentoService {
@@ -110,6 +115,31 @@ public class AgendamentoService {
             System.out.println("ERRO REAL: " + e.getMessage());
             throw e;
         }
+    }
+
+    public Agendamento atualizarAgendamento(Long id , Agendamento dadosNovos){
+        Agendamento agendamentoBanco = agendamentoRepository.findById(id)       // verifica se o id existe no banco
+                .orElseThrow(() -> new RuntimeException("Erro: Agendamento nao encontrado"));  // caso nao existir
+        BeanUtils.copyProperties(dadosNovos, agendamentoBanco, getNullPropertyNames(dadosNovos));       // chama esse metodo do Spring que copia dados de um objeto p/ outro
+        // (1 campo oq ele vai ler , 2 campo para onde ele vai colocar oq ele leu, terceiro campo o metodo que criei para ele ignora oq nao esta escrito e assim nao sobreescreve
+        return agendamentoRepository.save(agendamentoBanco);                // salva o agendamento atualizado
+
+    }
+
+    // metodo que serve para verificar os campos nulos q vieram no Json
+    private String[] getNullPropertyNames(Object source) {
+        final BeanWrapper src = new BeanWrapperImpl(source);
+        java.beans.PropertyDescriptor[] pds = src.getPropertyDescriptors();
+
+        Set<String> emptyNames = new HashSet<>();
+        for (java.beans.PropertyDescriptor pd : pds) {
+            Object srcValue = src.getPropertyValue(pd.getName());
+            // Se o campo for nulo, adiciona ele na lista de "ignorar"
+            if (srcValue == null) emptyNames.add(pd.getName());
+        }
+
+        String[] result = new String[emptyNames.size()];
+        return emptyNames.toArray(result);
     }
 
 }
