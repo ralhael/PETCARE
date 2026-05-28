@@ -142,4 +142,9 @@ public class AgendamentoService {
         return emptyNames.toArray(result);
     }
 
+    // metodo para buscar o cliente puxando para o metodo la na repository ( uma ponte )
+    public List<Agendamento> buscarPorCliente(Long clienteId){
+        return agendamentoRepository.findByClienteId(clienteId);
+    }
+
 }

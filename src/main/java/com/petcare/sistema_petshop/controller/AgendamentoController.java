@@ -31,5 +31,11 @@ public class AgendamentoController{
         return ResponseEntity.ok(agendamentoAtualizado);
     }
 
+    @GetMapping("/cliente/{clienteId}")         // vai ser uma requisicao do tipo get e os endpoint que vai ter que usar para poder acessar esse metodo
+    public ResponseEntity<List<Agendamento>> buscarPorCliente(@PathVariable Long clienteId){        // response vai controlar a resposta que nos volta ( Path vai pegar a variavel na url e jopga dentro do clientId
+        List<Agendamento> listaAgendamentos = agendamentoService.buscarPorCliente(clienteId);       // cria uma lista e guarda oq voltou da Service -> repository -> supa
+        return ResponseEntity.ok(listaAgendamentos);                                                // retornar dizendo que foi um sucesso ( codigo 200 )
+    }
+
 
 }
