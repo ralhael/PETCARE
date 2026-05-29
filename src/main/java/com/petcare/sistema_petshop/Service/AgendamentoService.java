@@ -155,4 +155,8 @@ public class AgendamentoService {
         agendamentoRepository.save(agendamento);                                                // salva o agendamento
     }
 
+    public List<Agendamento> buscarPorData(LocalDate data){         // vai retornar lista de datas chamando metodo da repository q busca as datas
+        return agendamentoRepository.findByData(data);
+    }
+
 }

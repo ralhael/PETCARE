@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequestMapping("/agendamentos")        // é o caminho/endpoint que vai servir para rodar no localHost dessa funcao expecifica
@@ -41,6 +42,12 @@ public class AgendamentoController{
     public ResponseEntity<Void> deletar(@PathVariable long id){
         agendamentoService.cancelarAgendamento(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/data/{data}")
+    public ResponseEntity<List<Agendamento>> bucarPorData(@PathVariable LocalDate data){
+        List<Agendamento> lista = agendamentoService.buscarPorData(data);
+        return ResponseEntity.ok(lista);
     }
 
 

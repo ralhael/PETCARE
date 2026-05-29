@@ -14,4 +14,6 @@ public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> 
     boolean existsByAnimalIdAndDataAndHorario(Long animalId, LocalDate data, LocalTime horario);
 
     List<Agendamento> findByClienteId(Long clienteId);  // vai retornar uma lista de agendamentos daquele cliente em especifico passando o Id
+
+    List<Agendamento> findByData(LocalDate data);       // metodo q vai chamar a lista de datas
 }
