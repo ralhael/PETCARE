@@ -147,4 +147,12 @@ public class AgendamentoService {
         return agendamentoRepository.findByClienteId(clienteId);
     }
 
+    // metodo para poder "cancelar" ( vou mudar apenas o status dele para cancelado
+    public void cancelarAgendamento(Long id){           // cria metodo que nao retorna nada e recebe de parametro o Id do agendamento q ta procurando
+        Agendamento agendamento = agendamentoRepository.findById(id)  // aqui eu crio a variavel agendamento para salvar nela qnd reposiroty buscar pelo id lido
+                .orElseThrow(() -> new RuntimeException("Erro: Agendamento nao encontrado"));   // caso nao encontre
+        agendamento.setStatus("Cancelado");                                                     // encontrou entao muda o Status do agendamento para Cancelado
+        agendamentoRepository.save(agendamento);                                                // salva o agendamento
+    }
+
 }

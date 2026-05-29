@@ -37,5 +37,11 @@ public class AgendamentoController{
         return ResponseEntity.ok(listaAgendamentos);                                                // retornar dizendo que foi um sucesso ( codigo 200 )
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable long id){
+        agendamentoService.cancelarAgendamento(id);
+        return ResponseEntity.noContent().build();
+    }
+
 
 }
