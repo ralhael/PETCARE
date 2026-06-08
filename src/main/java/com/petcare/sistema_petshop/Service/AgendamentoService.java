@@ -158,6 +158,15 @@ public class AgendamentoService {
         return agendamentoRepository.findByData(data);
     }
 
+    public void atualizarStatus(Long id , String novoStatus){
+        Agendamento agendamento = agendamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Erro : Agendamento nao encontrado"));
+
+        String statusLimpo = novoStatus.replace("\"", "").trim();
+        agendamento.setStatus(statusLimpo);
+        agendamentoRepository.save(agendamento);
+    }
+
 
 
 }
