@@ -1,6 +1,7 @@
 package com.petcare.sistema_petshop.controller;
 
 import com.petcare.sistema_petshop.Service.AgendamentoService;
+import com.petcare.sistema_petshop.dto.AgendamentoRequestDTO;
 import com.petcare.sistema_petshop.model.Agendamento;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,21 +10,23 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@RequestMapping("/agendamentos")        // é o caminho/endpoint que vai servir para rodar no localHost dessa funcao expecifica
-@RestController                         // anotacao que faz entender que é responsvael por se comunicar com a web e fzer Lista>Json
-public class AgendamentoController{
+@RequestMapping("/agendamentos")        // É o caminho/endpoint que vai servir para rodar no localhost dessa função específica
+@RestController                         // Anotação que faz entender que é responsável por se comunicar com a web e fazer Lista -> JSON
+public class AgendamentoController {
 
-    @Autowired                          // faz a injencao de instancia
-    AgendamentoService agendamentoService;
+    @Autowired                          // Faz a injeção de instância da service
+    private AgendamentoService agendamentoService;
 
-    @GetMapping                         // anotacao que declara que é um metodo de ler/pegar ( metodo get )
+    @GetMapping                         // Anotação que declara que é um  de ler/pegar (GET)
     public List<Agendamento> listarTodos(){
         return agendamentoService.listarTodos();
     }
 
-    @PostMapping                        // anotacao que faz entender que é um metodo de criar/salvar ( metodo post )
-    public Agendamento salvar(@RequestBody Agendamento agendamento){
-        return agendamentoService.salvar(agendamento);
+    @PostMapping
+    public ResponseEntity<Agendamento> salvar(@RequestBody AgendamentoRequestDTO dados){
+        // Agora recebe o DTO com os IDs e envia para a service tratar
+        Agendamento agendamentoSalvo = agendamentoService.salvar(dados);
+        return ResponseEntity.ok(agendamentoSalvo);
     }
 
     @PatchMapping("/{id}")
@@ -32,10 +35,10 @@ public class AgendamentoController{
         return ResponseEntity.ok(agendamentoAtualizado);
     }
 
-    @GetMapping("/cliente/{clienteId}")         // vai ser uma requisicao do tipo get e os endpoint que vai ter que usar para poder acessar esse metodo
-    public ResponseEntity<List<Agendamento>> buscarPorCliente(@PathVariable Long clienteId){        // response vai controlar a resposta que nos volta ( Path vai pegar a variavel na url e jopga dentro do clientId
-        List<Agendamento> listaAgendamentos = agendamentoService.buscarPorCliente(clienteId);       // cria uma lista e guarda oq voltou da Service -> repository -> supa
-        return ResponseEntity.ok(listaAgendamentos);                                                // retornar dizendo que foi um sucesso ( codigo 200 )
+    @GetMapping("/cliente/{clienteId}")         // Vai ser uma requisição do tipo GET recebendo o ID do cliente na URL
+    public ResponseEntity<List<Agendamento>> buscarPorCliente(@PathVariable Long clienteId){
+        List<Agendamento> listaAgendamentos = agendamentoService.buscarPorCliente(clienteId);
+        return ResponseEntity.ok(listaAgendamentos);                                                // Retorna o status 200 sucesso com a lista
     }
 
     @DeleteMapping("/{id}")
@@ -49,6 +52,4 @@ public class AgendamentoController{
         List<Agendamento> lista = agendamentoService.buscarPorData(data);
         return ResponseEntity.ok(lista);
     }
-
-
 }

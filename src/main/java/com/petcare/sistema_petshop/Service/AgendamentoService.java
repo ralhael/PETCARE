@@ -1,6 +1,7 @@
 package com.petcare.sistema_petshop.Service;
 
 
+import com.petcare.sistema_petshop.dto.AgendamentoRequestDTO;
 import com.petcare.sistema_petshop.model.*;
 import com.petcare.sistema_petshop.repository.*;
 import org.springframework.beans.BeanUtils;
@@ -37,61 +38,46 @@ public class AgendamentoService {
         return agendamentoRepository.findAll();
     }
 
-    public Agendamento salvar(Agendamento agendamento){
+    public Agendamento salvar(AgendamentoRequestDTO dados){
         try {
 
-            // 1. Validação de data retroativa
-            if(agendamento.getData().isBefore(LocalDate.now())){            // if para verificar se a hora ou data do agendamento é anterior a de hoje
+            // validar se a data ja passou
+            if(dados.data().isBefore(LocalDate.now())){
                 throw new RuntimeException("Erro: a data de agendamento ja passou");
             }
 
-            // 2. Validação do horário de funcionamento do Petshop
-            LocalTime abertura = LocalTime.of(8 , 0 );     // crio uma variavel do tipo LocalTime para armazenar a hora que o estabelecimento abre
-            LocalTime fechamento = LocalTime.of(18, 0);     // crio uma variavel do tipo LocalTime para armazenar a hora que o estabelicmento encerra
-            if(agendamento.getHorario().isBefore(abertura) || agendamento.getHorario().isAfter(fechamento)){     // pergunto se o horario do agendamento foi feito antes da abertura ou feito dps do fechamento
+            // validar se ta fora de funcionamento
+            LocalTime abertura = LocalTime.of(8 , 0 );
+            LocalTime fechamento = LocalTime.of(18, 0);
+            if(dados.hora().isBefore(abertura) || dados.hora().isAfter(fechamento)){
                 throw new RuntimeException("Erro: agendamento marcado para fora do horario de serviço (08:00 as 18:00)");
             }
 
-            // 3. Definição do status padrão caso venha vazio
-            if(agendamento.getStatus()== null || agendamento.getStatus().isEmpty()){
-                agendamento.setStatus("Pendente");
+            // verifica se o servico existe
+            Servico servicoBanco = servicoRepository.findById(dados.servicoId())
+                    .orElseThrow(() -> new RuntimeException("Erro: Serviço não encontrado"));
+
+            // verifica se o cliente existe
+            Cliente clienteBanco = clienteRepository.findById(dados.clienteId())
+                    .orElseThrow(() -> new RuntimeException("Erro: Cliente não encontrado no banco de dados "));
+
+            // verifica se ela existe ou se ja tem horario marcado p aql hora
+            Animal animalBanco = animalRepository.findById(dados.animalId())
+                    .orElseThrow(() -> new RuntimeException("Erro: Animal não encontrado no banco de dados"));
+
+            boolean animalOcupado = agendamentoRepository.existsByAnimalIdAndDataAndHorario(
+                    dados.animalId(),
+                    dados.data(),
+                    dados.hora()
+            );
+            if (animalOcupado){
+                throw new RuntimeException("Erro: Este animal já possui um agendamento marcado para este mesmo dia e horário.");
             }
 
-            // 4. Validação e amarração do Serviço (Garantir que o serviço selecionado existe)
-            if (agendamento.getServico() != null && agendamento.getServico().getId() != null) {
-                Servico servicoBanco = servicoRepository.findById(agendamento.getServico().getId())
-                        .orElseThrow(() -> new RuntimeException("Erro: Serviço não encontrado"));
-                agendamento.setServico(servicoBanco);
-            }
-
-            // validar se existe o cliente
-            if(agendamento.getCliente()!= null && agendamento.getCliente().getId()!= null){         // verifica se o cliente e o id do cliente veio diferente de nulo
-                Cliente clienteBanco = clienteRepository.findById(agendamento.getCliente().getId())  // busca no banco o cliente com o Id é oq ele recebeu
-                        .orElseThrow(() -> new RuntimeException("Erro: Cliente não encontrado no banco de dados "));  // se nao , manda mensagem de erro dizendo que nao foi encontrado no banco
-                agendamento.setCliente(clienteBanco);  // pega o cliente buscado e coloca no agendamento
-            }
-
-            //evitar agendamento duplicado(mesmo dia mesmo horario)
-            if(agendamento.getAnimal()!= null&&agendamento.getAnimal().getId()!= null){           // verifico se o animal ja existe no banco
-                Animal animalBanco = animalRepository.findById(agendamento.getAnimal().getId())
-                        .orElseThrow(() -> new RuntimeException("Erro: Animal não encontrado no banco de dados"));
-                agendamento.setAnimal(animalBanco);
-                boolean animalOcupado = agendamentoRepository.existsByAnimalIdAndDataAndHorario(    // salvo em animal ocupado(boolean ent vai retornar true se o metodo da repository disser que ja existe aql id nql horario e dia)
-                        agendamento.getAnimal().getId(),        // os parametros do metodo q criei no agendamentoRepository
-                        agendamento.getData(),
-                        agendamento.getHorario()
-                );
-                if (animalOcupado){                             // se der true retorna esse erro ai
-                    throw new RuntimeException("Erro: Este animal já possui um agendamento marcado para este mesmo dia e horário.");
-                }
-            }
-
-
-
-            // Pergunta ao banco quais funcionários não estão trabalhando nesta data e horário
+            // verificacao dos funcionarios livres
             List<Funcionario> funcionariosLivres = funcionarioRepository.findFuncionariosLivres(
-                    agendamento.getData(),
-                    agendamento.getHorario()
+                    dados.data(),
+                    dados.hora()
             );
 
             // Se a lista voltar vazia, significa que TODOS os funcionários cadastrados já estão ocupados nesse horário
@@ -102,13 +88,26 @@ public class AgendamentoService {
             // Se houver alguém livre, pega o primeiro profissional disponível da lista (posição 0)
             Funcionario funcionarioEscolhido = funcionariosLivres.get(0);
 
-            // Vincula o funcionário sorteado/disponível ao agendamento
-            agendamento.setFuncionario(funcionarioEscolhido);
 
-            // =========================================================================================
+            // 7. Instanciação e montagem da nossa Model real (Entidade) com os objetos que validamos
+            Agendamento novoAgendamento = new Agendamento();
+            novoAgendamento.setData(dados.data());
+            novoAgendamento.setHorario(dados.hora()); // Mapeado com o setHorario da sua Model
+
+            // Define o status: usa o do DTO se vier preenchido, senão joga "Pendente"
+            if (dados.status() == null || dados.status().isEmpty()) {
+                novoAgendamento.setStatus("Pendente");
+            } else {
+                novoAgendamento.setStatus(dados.status());
+            }
+
+            novoAgendamento.setServico(servicoBanco);
+            novoAgendamento.setCliente(clienteBanco);
+            novoAgendamento.setAnimal(animalBanco);
+            novoAgendamento.setFuncionario(funcionarioEscolhido);
 
             // Salva o agendamento blindado no banco de dados
-            return agendamentoRepository.save(agendamento);
+            return agendamentoRepository.save(novoAgendamento);
 
         }
         catch (Exception e){
@@ -158,5 +157,7 @@ public class AgendamentoService {
     public List<Agendamento> buscarPorData(LocalDate data){         // vai retornar lista de datas chamando metodo da repository q busca as datas
         return agendamentoRepository.findByData(data);
     }
+
+
 
 }

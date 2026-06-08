@@ -6,9 +6,10 @@ import java.time.LocalTime;
 public record AgendamentoRequestDTO(
         Long clienteId,
         Long animalId,
+        Long servicoId,
         Long funcionarioId,
-        LocalDate data ,
-        LocalTime hora ,
-        String servico,
-        String observacoes) {
+        LocalDate data,
+        LocalTime hora,
+        String status
+) {
 }
