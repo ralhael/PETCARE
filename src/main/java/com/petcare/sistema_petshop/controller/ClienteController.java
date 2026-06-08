@@ -1,8 +1,10 @@
 package com.petcare.sistema_petshop.controller;
 
 import com.petcare.sistema_petshop.Service.ClienteService;
+import com.petcare.sistema_petshop.dto.ClienteRequestDTO;
 import com.petcare.sistema_petshop.model.Cliente;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +21,15 @@ public class ClienteController {
         return clienteService.listarTodos();
     }
 
-    @PostMapping      // anotacao para dizer que espera o envio de dados ( metodo Post )
-    public Cliente salvar(@RequestBody Cliente cliente){      // traducao de Json para transformar em um objeto java Cliente
-        return clienteService.salvar(cliente);
+    @PostMapping
+    public ResponseEntity<Cliente> salvar(@RequestBody ClienteRequestDTO dados){
+        Cliente clienteSalvo = clienteService.salvar(dados);
+        return ResponseEntity.ok(clienteSalvo);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable long id){
+        clienteService.deletar(id);
+        return ResponseEntity.noContent().build();
     }
 }

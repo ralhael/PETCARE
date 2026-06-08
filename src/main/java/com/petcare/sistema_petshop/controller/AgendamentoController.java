@@ -29,7 +29,7 @@ public class AgendamentoController {
         return ResponseEntity.ok(agendamentoSalvo);
     }
 
-    @PutMapping("/{id}/status")
+    @PutMapping("/{id}/status")         // focado pra ser um metodo que vai mudar so o status , inves de tudo do agendamento igual o outro
     public ResponseEntity<Void> atualizarStatus(@PathVariable long id, @RequestBody String novoStatus){
         agendamentoService.atualizarStatus(id, novoStatus);
         return ResponseEntity.noContent().build();

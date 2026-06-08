@@ -1,5 +1,6 @@
 package com.petcare.sistema_petshop.Service;
 
+import com.petcare.sistema_petshop.dto.ClienteRequestDTO;
 import com.petcare.sistema_petshop.model.Cliente;
 import com.petcare.sistema_petshop.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +18,23 @@ public class ClienteService {
         return clienteRepository.findAll();
     }
 
-    public Cliente salvar(Cliente cliente){
+    public Cliente salvar(ClienteRequestDTO dados){
+        Cliente cliente = new Cliente();
+
+        //seta os dados que vêm da herança de Pessoa e da classe Cliente
+        cliente.setNome(dados.nome());
+        cliente.setCpf(dados.cpf());
+        cliente.setTelefone(dados.telefone());
+        cliente.setEndereco(dados.endereco());
+
         return clienteRepository.save(cliente);
+    }
+
+    public void deletar(Long id) {
+        if (!clienteRepository.existsById(id)) {
+            throw new RuntimeException("Erro: Cliente não encontrado para exclusão.");
+        }
+        clienteRepository.deleteById(id);
     }
 
 
