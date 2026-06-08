@@ -1,6 +1,7 @@
 package com.petcare.sistema_petshop.Service;
 
 import com.petcare.sistema_petshop.model.Animal;
+import com.petcare.sistema_petshop.model.Cliente;
 import com.petcare.sistema_petshop.repository.AnimalRepository;
 import com.petcare.sistema_petshop.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,15 +22,25 @@ public class AnimalService {
         return animalRepository.findAll();
     }
 
-    public Animal salvar (Animal animal){
-        if(animal.getCliente()==null || animal.getCliente().getId()==null){
-            throw  new RuntimeException("Todo animal precisa de um dono com Id válido!");
+    public Animal salvar(Animal animal, Long clienteId) {
+        if (clienteId == null) {
+            throw new RuntimeException("Erro: Todo animal precisa de um dono com ID válido!");
         }
-        if(!clienteRepository.existsById(animal.getCliente().getId())){
-            throw new RuntimeException("Cliente nao encontrado no banco de dados!");
-        }
-         return animalRepository.save(animal);
+
+        // Busca o cliente real no banco de dados para vincular ao animal
+        Cliente clienteBanco = clienteRepository.findById(clienteId)
+                .orElseThrow(() -> new RuntimeException("Erro: Cliente dono do pet não encontrado!"));
+
+        animal.setCliente(clienteBanco);
+        return animalRepository.save(animal);
     }
+
+    public void deletar(Long id){
+        if(!animalRepository.existsById(id))
+            throw new RuntimeException("Animal nao encontrado ");
+        animalRepository.deleteById(id);
+    }
+
 
 
 
