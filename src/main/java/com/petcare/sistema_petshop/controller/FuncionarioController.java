@@ -1,8 +1,10 @@
 package com.petcare.sistema_petshop.controller;
 
 import com.petcare.sistema_petshop.Service.FuncionarioService;
+import com.petcare.sistema_petshop.dto.FuncionarioRequestDTO;
 import com.petcare.sistema_petshop.model.Funcionario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +21,18 @@ public class FuncionarioController {
         return funcionarioService.listarTodos();
     }
 
-    @PostMapping                            // anotacao que faz entender que é um metodo que vai criar/colocar ( meotodo post )
-    public Funcionario salvar(@RequestBody Funcionario funcionario){            // faz com que ele faça a traducao do Json para a criaçao de um objeto em java
-        return funcionarioService.salvar(funcionario);
+    @PostMapping
+    public ResponseEntity<Funcionario> salvar(@RequestBody FuncionarioRequestDTO funcionarioDTO) {
+        Funcionario funcionarioSalvo = funcionarioService.salvar(funcionarioDTO);
+        return ResponseEntity.ok(funcionarioSalvo);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        funcionarioService.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 }
