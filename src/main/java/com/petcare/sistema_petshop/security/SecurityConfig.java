@@ -21,9 +21,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http
-                .csrf(csrf -> csrf.disable())           // desabilita a segurança de roubo de cokkies pelo nav(iremos usar tokens nao cookies)
-                .sessionManagement(session ->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // nao deixar padrao para nao armazenar na memoria quem loga(deve provar toda nova requiscao)
-                .authorizeHttpRequests(authorize -> authorize           //regras de quem pode acessar oque
+
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:5174"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    return corsConfiguration;
+                }))
+                .csrf(csrf -> csrf.disable())           // desabilita a segurança de roubo de cookies pelo nav(iremos usar tokens nao cookies)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // nao deixar padrao para nao armazenar na memoria quem loga(deve provar toda nova requiscao)
+                .authorizeHttpRequests(authorize -> authorize           //regras de quem pode acessar o que
+                        // 2. ADICIONADO: Libera os requests de teste (OPTIONS) do navegador antes do login
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()        //  qualquer um pode acessar a parte de login
                         .requestMatchers(HttpMethod.POST, "/auth/cadastro").permitAll()     //  qualquer um pode acessar a parte de cadastro
 
