@@ -38,12 +38,14 @@ public class SecurityFilter extends OncePerRequestFilter {
                 // 3. Busca o usuário no banco de dados para garantir que ele ainda existe e está ativo
                 UserDetails usuario = usuarioRepository.findByLogin(login);
 
-                // 4. Cria o "objeto de autenticação" que o Spring Security exige
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                if (usuario != null) {
+                    // 🚀 CORREÇÃO AQUI: Forçamos o Spring a usar as autoridades ("ROLE_ADMIN") que mapeamos no seu Usuario.java
+                    UsernamePasswordAuthenticationToken authentication =
+                            new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
 
-                // 5. Autentica oficialmente o usuário no motor interno do Spring Security
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // 5. Autentica oficialmente o usuário no motor interno do Spring Security
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
 

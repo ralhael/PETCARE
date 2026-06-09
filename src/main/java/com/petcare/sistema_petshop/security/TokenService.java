@@ -24,9 +24,15 @@ public class TokenService {
         Date agora = new Date();
         Date dataExpiracao = new Date(agora.getTime() + TEMPO_EXPIRACAO);
 
+        //  pegamos as roles que o usuário possui no sistema
+        java.util.List<String> roles = usuario.getAuthorities().stream()
+                .map(grantedAuthority -> grantedAuthority.getAuthority())
+                .toList();
+
         return Jwts.builder()
                 .setIssuer("API Sistema Petshop")  // diz que servidor gerou esse token
                 .setSubject(usuario.getLogin())    // guardar o email para saber quem fez a requisicao
+                .claim("roles", roles)             //  adiciona as permissões reais dentro do Token!
                 .setIssuedAt(agora)                // data e hora que foi criado
                 .setExpiration(dataExpiracao)      // data e hora que ele vai expirar
                 .signWith(CHAVE_SECRETA, SignatureAlgorithm.HS256) // força o algoritmo HS256 explicitamente aqui

@@ -23,18 +23,18 @@ public class AnimalController {
         return animalService.listarTodos();
     }
 
+    @PostMapping("/cao")
     public ResponseEntity<Animal> salvarCao(@RequestBody AnimalRequestDTO dados) {
         Cao cao = new Cao();
-        // Mapeia os dados gerais
+        // mapeia os dados gerais
         cao.setNome(dados.nome());
         cao.setIdade(dados.idade());
         cao.setPeso(dados.peso());
         cao.setSexo(dados.sexo());
         cao.setAlergias(dados.alergias());
         cao.setTemperamento(dados.temperamento());
+        cao.setPorte(dados.porte());
 
-        // Se a sua classe Cao tiver métodos específicos (ex: setRaca ou setPorte), descomente abaixo:
-        // cao.setRaca(dados.raca());
 
         Animal animalSalvo = animalService.salvar(cao, dados.clienteId());
         return ResponseEntity.ok(animalSalvo);
@@ -49,9 +49,10 @@ public class AnimalController {
         gato.setSexo(dados.sexo());
         gato.setAlergias(dados.alergias());
         gato.setTemperamento(dados.temperamento());
+        gato.setRacaCor(dados.raca());
 
-        // Se a sua classe Gato tiver métodos específicos, descomente abaixo:
-        // gato.setRaca(dados.raca());
+
+
 
         Animal animalSalvo = animalService.salvar(gato, dados.clienteId());
         return ResponseEntity.ok(animalSalvo);

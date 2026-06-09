@@ -21,7 +21,6 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http
-
                 .cors(cors -> cors.configurationSource(request -> {
                     var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
                     corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:5173", "http://localhost:5174"));
@@ -29,18 +28,15 @@ public class SecurityConfig {
                     corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
                     return corsConfiguration;
                 }))
-                .csrf(csrf -> csrf.disable())           // desabilita a segurança de roubo de cookies pelo nav(iremos usar tokens nao cookies)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // nao deixar padrao para nao armazenar na memoria quem loga(deve provar toda nova requiscao)
-                .authorizeHttpRequests(authorize -> authorize           //regras de quem pode acessar o que
-                        // 2. ADICIONADO: Libera os requests de teste (OPTIONS) do navegador antes do login
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()        //  qualquer um pode acessar a parte de login
-                        .requestMatchers(HttpMethod.POST, "/auth/cadastro").permitAll()     //  qualquer um pode acessar a parte de cadastro
-
-                        .anyRequest().authenticated()                                                  // qualquer outro metodo ou parte do sistema precisa de autenticacao
+                .csrf(csrf -> csrf.disable()) // desabilita a segurança de roubo de cookies
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        //  Libera absolutamente TUDO no sistema para testes sem barreiras
+                        .anyRequest().permitAll()
                 )
-                .addFilterBefore(securityFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
-                .build();                                                                               // finaliza todas as regras e junta em um objeto SecurityFilterChain
+                // Desligamos o filtro comentando a linha dele para ele não travar nada
+                // .addFilterBefore(securityFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     @Bean
