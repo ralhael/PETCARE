@@ -24,7 +24,7 @@ public class AgendamentoController {
 
     @PostMapping
     public ResponseEntity<Agendamento> salvar(@RequestBody AgendamentoRequestDTO dados){
-        // Agora recebe o DTO com os IDs e envia para a service tratar
+        // recebe o dto com os id
         Agendamento agendamentoSalvo = agendamentoService.salvar(dados);
         return ResponseEntity.ok(agendamentoSalvo);
     }
