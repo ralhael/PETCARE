@@ -34,7 +34,7 @@ public class SecurityConfig {
                         //  Libera absolutamente TUDO no sistema para testes sem barreiras
                         .anyRequest().permitAll()
                 )
-                // Desligamos o filtro comentando a linha dele para ele não travar nada
+                // tirei o filtro para parar de travar minhas requisicoes na apresentacao
                 // .addFilterBefore(securityFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
